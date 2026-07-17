@@ -1,0 +1,60 @@
+name: 同步上游项目数据
+
+on:
+  schedule:
+    # 每 6 小时检查一次。使用非整点时间，减少 GitHub Actions 排队。
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-data
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 检出网站仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 下载并检查上游数据
+        id: sync
+        run: |
+          bash scripts/sync-upstream.sh
+          if git diff --quiet -- data/README.md pages/README-Programmer-Edition.md pages/README-Game.md pages/README-2018-2020.md; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "上游数据没有变化。"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "发现上游数据更新。"
+            git diff --stat -- data/README.md pages/README-Programmer-Edition.md pages/README-Game.md pages/README-2018-2020.md
+          fi
+
+      - name: 设置 Node.js
+        if: steps.sync.outputs.changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖并验证网站
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          npm ci
+          npm run build
+
+      - name: 提交同步结果
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/README.md pages/README-Programmer-Edition.md pages/README-Game.md pages/README-2018-2020.md
+          git commit -m "chore(data): sync upstream project list"
+          git push origin HEAD:main
