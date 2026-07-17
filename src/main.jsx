@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ArrowUpRight, Check, ChevronLeft, ChevronRight, Clock3, Code2, Gamepad2, Search, Sparkles, X } from 'lucide-react';
-import mainRaw from '../README.md?raw';
+import mainRaw from '../data/README.md?raw';
 import programmerRaw from '../pages/README-Programmer-Edition.md?raw';
 import gameRaw from '../pages/README-Game.md?raw';
 import archiveRaw from '../pages/README-2018-2020.md?raw';
