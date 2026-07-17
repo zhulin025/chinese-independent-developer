@@ -28,7 +28,7 @@
 
 当前读取的数据文件包括：
 
-- `README.md`：可以直接使用的产品
+- 上游 `README.md` → 本仓库 `data/README.md`：可以直接使用的产品
 - `pages/README-Programmer-Edition.md`：开发者工具
 - `pages/README-Game.md`：独立游戏
 - `pages/README-2018-2020.md`：历史项目存档
@@ -58,11 +58,31 @@ npm run dev
 npm run build
 ```
 
-## 更新项目数据
+## 自动同步上游数据
 
-目前项目数据保存在仓库内的 Markdown 文件中。修改这些文件并推送到 `main` 分支后，Vercel 会自动重新构建和发布网站。
+仓库只保留一个名为“同步上游项目数据”的 GitHub Actions 工作流，负责让网站数据持续跟随原始仓库更新。
 
-仓库通过 GitHub Actions 每 24 小时检查一次原始数据仓库，也支持在 Actions 页面手动触发。发现变化后会同步四个数据文件、执行完整构建校验，并由机器人提交到 `main` 分支。Vercel 随后自动发布新版本；如果数据没有变化，则不会产生提交或部署。
+工作流每天执行一次，计划时间为 UTC 01:17，即北京时间约 09:17。GitHub Actions 在繁忙时可能延迟几分钟，也可以在 Actions 页面通过 `workflow_dispatch` 随时手动触发。
+
+一次同步会依次完成：
+
+1. 检出网站仓库的最新 `main` 分支。
+2. 从原始仓库下载四个 Markdown 数据文件。
+3. 检查下载结果是否为空，并确认文件中包含可识别的项目条目。
+4. 比较上游数据和本站数据是否存在变化。
+5. 如果没有变化，直接结束，不产生提交和部署。
+6. 如果存在变化，安装依赖并运行 `npm run build` 验证网站。
+7. 构建成功后，由 `github-actions[bot]` 将数据更新提交到 `main` 分支。
+8. Vercel 检测到新提交后自动构建，并更新线上网站。
+
+如果下载、数据检查或网站构建失败，工作流会停止，不会覆盖当前数据，也不会发布异常版本。
+
+相关文件：
+
+- `.github/workflows/sync-upstream.yml`：定时计划和 GitHub Actions 执行步骤
+- `scripts/sync-upstream.sh`：上游文件下载与内容检查脚本
+
+除了自动同步，也可以直接修改仓库内的数据文件并推送到 `main` 分支，Vercel 同样会自动重新构建和发布网站。
 
 ## 项目提交
 
