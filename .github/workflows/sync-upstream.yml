@@ -2,8 +2,8 @@ name: 同步上游项目数据
 
 on:
   schedule:
-    # 每 6 小时检查一次。使用非整点时间，减少 GitHub Actions 排队。
-    - cron: '17 */6 * * *'
+    # 每天北京时间约 09:17 检查一次。使用非整点时间，减少 GitHub Actions 排队。
+    - cron: '17 1 * * *'
   workflow_dispatch:
 
 permissions:
