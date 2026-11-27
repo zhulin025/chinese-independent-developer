@@ -24,6 +24,12 @@
 | :clock8: | :white_check_mark: | :x: |
 
 ## 3. 项目列表
+
+### 2026 年 11 月 27 号添加
+
+#### Hinstein - [Github](https://github.com/Hinstein)
+* :white_check_mark: [StagePeek](https://stagepeek.live/zh-CN/)：演唱会场馆 2D 座位图与 3D 舞台视角模拟器，覆盖全球 201 座体育场与剧院，支持 1x–10x 手机变焦视野预览，免登录即可免费体验首个座位
+
 ### 2026 年 9 月 7 号添加
 
 #### aiScribeFlash（北京） - [Github](https://github.com/overseax)
